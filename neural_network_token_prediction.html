@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Language Model Pipeline</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            padding: 25px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2.2em;
+            color: #333;
+            margin-bottom: 8px;
+            font-weight: 300;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+            font-style: italic;
+        }
+        
+        .network-flow {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 40px 0;
+            overflow-x: auto;
+            padding: 20px 0;
+        }
+        
+        .flow-section {
+            flex: 1;
+            text-align: center;
+            margin: 0 4px;
+            min-width: 130px;
+        }
+        
+        .flow-arrow {
+            font-size: 1.6em;
+            color: #667eea;
+            margin: 0 6px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+        
+        .section-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        /* Input Text */
+        .input-text {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1em;
+            color: #2d3748;
+            margin-bottom: 15px;
+        }
+        
+        /* Tokenizer */
+        .tokenizer-box {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .tokenizer-process {
+            font-size: 0.8em;
+            color: #856404;
+            margin-bottom: 10px;
+        }
+        
+        .token-ids {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 6px;
+        }
+        
+        .token-id {
+            background: #dc3545;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
+            animation: tokenPulse 2s infinite;
+            box-shadow: 0 2px 6px rgba(220, 53, 69, 0.3);
+        }
+        
+        @keyframes tokenPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 2px 6px rgba(220, 53, 69, 0.3); }
+            50% { transform: scale(1.05); box-shadow: 0 4px 12px rgba(220, 53, 69, 0.5); }
+        }
+        
+        /* Vocabulary Logits */
+        .logits-box {
+            background: #e6f3ff;
+            border: 2px solid #4dabf7;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .logits-process {
+            font-size: 0.8em;
+            color: #1971c2;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .logit-values {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4px;
+        }
+        
+        .logit-item {
+            background: #4dabf7;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 0.75em;
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+        }
+        
+        /* Softmax */
+        .softmax-box {
+            background: #f3e5f5;
+            border: 2px solid #9c27b0;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        
+        .softmax-process {
+            font-size: 0.9em;
+            color: #7b1fa2;
+            margin-bottom: 5px;
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .softmax-formula {
+            font-size: 0.8em;
+            color: #7b1fa2;
+            font-style: italic;
+        }
+        
+        /* Input Tokens */
+        .input-tokens {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .token {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 500;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        
+        .token.current {
+            background: linear-gradient(135deg, #ed8936, #f56500);
+            animation: glow 1.5s infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+            to { box-shadow: 0 4px 15px rgba(237, 137, 54, 0.5); }
+        }
+        
+        /* Neural Network */
+        .neural-network {
+            position: relative;
+            background: #f8f9fa;
+            border-radius: 12px;
+            
+            border: 2px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .network-layer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0 4px;
+            flex: 1;
+            max-width: 70px;
+        }
+        
+        .layer-label {
+            font-size: 0.6em;
+            color: #666;
+            margin-bottom: 8px;
+            font-weight: 600;
+            text-align: center;
+            line-height: 1.1;
+        }
+        
+        .neurons-container {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            align-items: center;
+        }
+        
+        .network-layer:not(:last-child)::after {
+            content: '→';
+            position: absolute;
+            right: -12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1em;
+            color: #667eea;
+            font-weight: bold;
+        }
+        
+        .network-layer {
+            position: relative;
+        }
+        
+        .neuron {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #38b2ac, #319795);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.6em;
+            font-weight: bold;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            animation: neuronPulse 3s infinite;
+        }
+        
+        @keyframes neuronPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .embedding-layer .neuron {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+        
+        .hidden-layer .neuron {
+            background: linear-gradient(135deg, #38b2ac, #319795);
+        }
+        
+        .output-layer .neuron {
+            background: linear-gradient(135deg, #ed8936, #f56500);
+        }
+        
+        /* Output Probabilities */
+        .probability-bars {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+        }
+        
+        .prob-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+        
+        .prob-token {
+            min-width: 60px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .prob-bar {
+            flex: 1;
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            margin: 0 10px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .prob-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 10px;
+            transition: width 2s ease;
+            position: relative;
+        }
+        
+        .prob-fill.high {
+            background: linear-gradient(90deg, #48bb78, #38a169);
+        }
+        
+        .prob-fill.medium {
+            background: linear-gradient(90deg, #ed8936, #f56500);
+        }
+        
+        .prob-value {
+            min-width: 45px;
+            text-align: right;
+            font-weight: bold;
+            color: #333;
+            font-size: 0.85em;
+        }
+        
+        /* Example Section */
+        .example-section {
+            background: #e6fffa;
+            border-left: 4px solid #38b2ac;
+            padding: 20px;
+            margin-top: 30px;
+            border-radius: 8px;
+        }
+        
+        .example-title {
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        
+        .example-text {
+            font-family: 'Courier New', monospace;
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 6px;
+            line-height: 1.4;
+        }
+        
+        .highlight {
+            background: #ffd60a;
+            color: #333;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        
+        .prediction {
+            background: #48bb78;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧠 Complete Language Model Pipeline</h1>
+            <p>From Text to Tokens to Predictions: The Full Process</p>
+        </div>
+        
+        <div class="network-flow">
+            <!-- INPUT TEXT SECTION -->
+            <div class="flow-section">
+                <div class="section-title">📝 Input Text</div>
+                <div class="input-text">
+                    "The cat sat on the"
+                </div>
+                <div style="font-size: 0.8em; color: #666; margin-top: 10px;">
+                    Raw string input<br>
+                    Ready for tokenization
+                </div>
+            </div>
+            
+            <div class="flow-arrow">→</div>
+            
+            <!-- TOKENIZER SECTION -->
+            <div class="flow-section">
+                <div class="section-title">⚙️ Tokenizer</div>
+                <div class="tokenizer-box">
+                    <div class="tokenizer-process">BPE Tokenization Process</div>
+                    <div class="token-ids">
+                        <div class="token-id">15496</div>
+                        <div class="token-id">2415</div>
+                        <div class="token-id">3332</div>
+                        <div class="token-id">319</div>
+                        <div class="token-id">262</div>
+                    </div>
+                </div>
+                <div style="font-size: 0.8em; color: #666; margin-top: 10px;">
+                    Text → Token IDs<br>
+                    Using trained vocabulary
+                </div>
+            </div>
+            
+            <div class="flow-arrow">→</div>
+            
+            <!-- NEURAL NETWORK SECTION -->
+            <div class="flow-section">
+                <div class="section-title">🔗 Neural Network</div>
+                                 <div class="neural-network">
+                     <!-- Embedding Layer -->
+                     <div class="network-layer embedding-layer">
+                         <div class="layer-label">Token<br>Embeddings</div>
+                         <div class="neurons-container">
+                             <div class="neuron">E1</div>
+                             <div class="neuron">E2</div>
+                             <div class="neuron">E3</div>
+                             <div class="neuron">E4</div>
+                             <div class="neuron">E5</div>
+                         </div>
+                     </div>
+                     
+                     <!-- Hidden Layer 1 -->
+                     <div class="network-layer hidden-layer">
+                         <div class="layer-label">Hidden<br>Layer 1</div>
+                         <div class="neurons-container">
+                             <div class="neuron">H1</div>
+                             <div class="neuron">H2</div>
+                             <div class="neuron">H3</div>
+                             <div class="neuron">H4</div>
+                             <div class="neuron">H5</div>
+                             <div class="neuron">H6</div>
+                         </div>
+                     </div>
+                     
+                     <!-- Hidden Layer 2 -->
+                     <div class="network-layer hidden-layer">
+                         <div class="layer-label">Hidden<br>Layer 2</div>
+                         <div class="neurons-container">
+                             <div class="neuron">H7</div>
+                             <div class="neuron">H8</div>
+                             <div class="neuron">H9</div>
+                             <div class="neuron">H10</div>
+                         </div>
+                     </div>
+                     
+                     <!-- Output Layer -->
+                     <div class="network-layer output-layer">
+                         <div class="layer-label">Output<br>(Vocabulary)</div>
+                         <div class="neurons-container">
+                             <div class="neuron">O1</div>
+                             <div class="neuron">O2</div>
+                             <div class="neuron">...</div>
+                             <div class="neuron">On</div>
+                         </div>
+                     </div>
+                 </div>
+                <div style="font-size: 0.75em; color: #666; margin-top: 8px;">
+                    Token IDs → Embeddings<br>
+                    → Hidden → Output
+                </div>
+            </div>
+            
+            <div class="flow-arrow">→</div>
+            
+            <!-- VOCABULARY LOGITS SECTION -->
+            <div class="flow-section">
+                <div class="section-title">📈 Vocabulary Logits</div>
+                <div class="logits-box">
+                    <div class="logits-process">Raw Scores (Pre-Softmax)</div>
+                    <div class="logit-values">
+                        <div class="logit-item">mat: 8.2</div>
+                        <div class="logit-item">table: 7.1</div>
+                        <div class="logit-item">floor: 5.8</div>
+                        <div class="logit-item">chair: 4.2</div>
+                        <div class="logit-item">bed: 2.9</div>
+                        <div class="logit-item">...: 1.5</div>
+                    </div>
+                </div>
+                <div style="font-size: 0.75em; color: #666; margin-top: 8px;">
+                    Linear layer output<br>
+                    50k+ raw scores
+                </div>
+            </div>
+            
+            <div class="flow-arrow">→</div>
+            
+            <!-- SOFTMAX SECTION -->
+            <div class="flow-section">
+                <div class="section-title">🎯 Softmax</div>
+                <div class="softmax-box">
+                    <div class="softmax-process">exp(logits) / Σexp(logits)</div>
+                    <div class="softmax-formula">Converts scores → probabilities</div>
+                </div>
+                <div style="font-size: 0.75em; color: #666; margin-top: 8px;">
+                    Normalize to sum=1<br>
+                    Creates distribution
+                </div>
+            </div>
+            
+            <div class="flow-arrow">→</div>
+            
+            <!-- OUTPUT SECTION -->
+            <div class="flow-section">
+                <div class="section-title">📊 Next Token Probabilities</div>
+                <div class="probability-bars">
+                    <div class="prob-item">
+                        <div class="prob-token">mat</div>
+                        <div class="prob-bar">
+                            <div class="prob-fill high" style="width: 42%;"></div>
+                        </div>
+                        <div class="prob-value">42%</div>
+                    </div>
+                    
+                    <div class="prob-item">
+                        <div class="prob-token">table</div>
+                        <div class="prob-bar">
+                            <div class="prob-fill high" style="width: 28%;"></div>
+                        </div>
+                        <div class="prob-value">28%</div>
+                    </div>
+                    
+                    <div class="prob-item">
+                        <div class="prob-token">floor</div>
+                        <div class="prob-bar">
+                            <div class="prob-fill medium" style="width: 15%;"></div>
+                        </div>
+                        <div class="prob-value">15%</div>
+                    </div>
+                    
+                    <div class="prob-item">
+                        <div class="prob-token">chair</div>
+                        <div class="prob-bar">
+                            <div class="prob-fill medium" style="width: 8%;"></div>
+                        </div>
+                        <div class="prob-value">8%</div>
+                    </div>
+                    
+                    <div class="prob-item">
+                        <div class="prob-token">bed</div>
+                        <div class="prob-bar">
+                            <div class="prob-fill" style="width: 4%;"></div>
+                        </div>
+                        <div class="prob-value">4%</div>
+                    </div>
+                    
+                    <div class="prob-item">
+                        <div class="prob-token">...</div>
+                        <div class="prob-bar">
+                            <div class="prob-fill" style="width: 3%;"></div>
+                        </div>
+                        <div class="prob-value">3%</div>
+                    </div>
+                </div>
+                <div style="font-size: 0.8em; color: #666; margin-top: 10px;">
+                    Softmax over entire<br>
+                    vocabulary (50k+ tokens)
+                </div>
+            </div>
+        </div>
+        
+        <div class="example-section">
+            <div class="example-title">💡 Example: Complete Language Model Pipeline</div>
+            <div class="example-text">
+<span class="highlight">Step 1 - Text Input:</span> "The cat sat on the"
+<span class="highlight">Step 2 - Tokenization:</span> Text → Token IDs [15496, 2415, 3332, 319, 262]
+<span class="highlight">Step 3 - Embeddings:</span> Token IDs → Dense vector representations (e.g., 512-dim)
+<span class="highlight">Step 4 - Neural Layers:</span> Hidden layers process sequence context
+<span class="highlight">Step 5 - Vocabulary Logits:</span> Linear layer outputs raw scores for 50k+ tokens
+<span class="highlight">Step 6 - Softmax:</span> Convert logits to probability distribution (sum=1)
+<span class="highlight">Step 7 - Prediction:</span> Sample or pick highest probability → <span class="prediction">"mat"</span> (42%)
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

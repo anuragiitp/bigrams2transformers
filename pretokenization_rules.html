@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pre-tokenization Rules</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            padding: 25px;
+            max-width: 650px;
+            width: 100%;
+            border-top: 5px solid #667eea;
+        }
+        
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .icon {
+            font-size: 1.8em;
+            margin-right: 12px;
+        }
+        
+        .title {
+            font-size: 1.6em;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .description {
+            color: #555;
+            font-size: 1em;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+        
+        .regex-section {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .regex-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .regex-pattern {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            line-height: 1.4;
+            word-break: break-all;
+            overflow-wrap: break-word;
+        }
+        
+        .handles-section {
+            margin-bottom: 20px;
+        }
+        
+        .handles-title {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .handles-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        
+        .handle-item {
+            background: #e6fffa;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.9em;
+            color: #2d3748;
+            border-left: 3px solid #38b2ac;
+        }
+        
+        .example-section {
+            background: #fff3cd;
+            border-radius: 8px;
+            padding: 15px;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .example-title {
+            font-weight: bold;
+            color: #856404;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+        
+        .example-input {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 8px 10px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            margin-bottom: 10px;
+        }
+        
+        .example-output {
+            background: #d4edda;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8em;
+            color: #155724;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+        
+        .highlight {
+            background: #fff3cd;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="icon">⚙️</div>
+            <div class="title">Pre-tokenization Rules</div>
+        </div>
+        
+        <div class="description">
+            Normalizes and splits input before BPE is applied
+        </div>
+        
+        <div class="regex-section">
+            <div class="regex-label">REGEX PATTERN:</div>
+            <div class="regex-pattern">
+re.compile(r"""'s|'t|'re|'ve|'m|'ll|'d| ?\p{L}+| ?\p{N}+| ?[^\s\p{L}\p{N}]+|\s+(?!\S)|\s+""")
+            </div>
+        </div>
+        
+        <div class="handles-section">
+            <div class="handles-title">🎯 Handles:</div>
+            <div class="handles-list">
+                <div class="handle-item">📝 Contractions ('ve, 's)</div>
+                <div class="handle-item">🔤 Letters with/without spaces</div>
+                <div class="handle-item">🔢 Numbers with/without spaces</div>
+                <div class="handle-item">❗ Punctuation & whitespace</div>
+            </div>
+        </div>
+        
+        <div class="example-section">
+            <div class="example-title">📋 EXAMPLE:</div>
+            <div class="example-input">
+                Input: "Hello've world123 how's are you!!!?"
+            </div>
+            <div class="example-output">
+Tokenized: ['Hello', "'ve", ' world', '123', ' how', "'s", ' are', ' you', '!!!', '?']
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

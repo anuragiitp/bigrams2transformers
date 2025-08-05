@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Character-Level Language Models Comparison</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 15px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            padding: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        
+        .header h1 {
+            font-size: 1.8em;
+            color: #333;
+            margin-bottom: 5px;
+            font-weight: 300;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 1em;
+            font-style: italic;
+        }
+        
+        .problem-statement {
+            background: #e6fffa;
+            border-left: 4px solid #38b2ac;
+            padding: 10px 15px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            text-align: center;
+        }
+        
+        .problem-statement .title {
+            font-weight: bold;
+            color: #2d3748;
+            font-size: 1.1em;
+        }
+        
+        .models-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .model-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            border-top: 4px solid #667eea;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease;
+        }
+        
+        .model-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .model-card.neural {
+            border-top-color: #764ba2;
+        }
+        
+        .model-card.mlp {
+            border-top-color: #38b2ac;
+        }
+        
+        .model-card.cnn {
+            border-top-color: #ed8936;
+        }
+        
+        .model-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .model-icon {
+            font-size: 1.6em;
+            margin-right: 8px;
+        }
+        
+        .model-title {
+            flex: 1;
+        }
+        
+        .model-name {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 2px;
+        }
+        
+        .model-type {
+            font-size: 0.8em;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .model-content {
+            space-y: 12px;
+        }
+        
+        .detail-item {
+            margin-bottom: 8px;
+        }
+        
+        .detail-label {
+            font-weight: bold;
+            color: #4a5568;
+            font-size: 0.8em;
+            margin-bottom: 2px;
+        }
+        
+        .detail-value {
+            color: #2d3748;
+            font-size: 0.85em;
+            line-height: 1.3;
+        }
+        
+        .highlight {
+            background: #fff3cd;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+            color: #856404;
+        }
+        
+        .params-box {
+            background: #e2e8f0;
+            padding: 6px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8em;
+            color: #2d3748;
+            margin: 3px 0;
+        }
+        
+        .training-box {
+            background: #d4edda;
+            padding: 6px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            color: #155724;
+            margin: 3px 0;
+        }
+        
+        .context-box {
+            background: #f8d7da;
+            padding: 6px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            color: #721c24;
+            margin: 3px 0;
+            font-weight: bold;
+        }
+        
+        .method-box {
+            background: #d1ecf1;
+            padding: 6px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            color: #0c5460;
+            margin: 3px 0;
+        }
+        
+        .architecture-box {
+            background: #fff3cd;
+            padding: 6px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            color: #856404;
+            margin: 3px 0;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>From Bigrams to Transformers:</h1>
+            <p>outlines different approaches to learn language modeling concepts</p>
+        </div>
+        
+        <div class="problem-statement">
+            <div class="title">🎯 Problem: Predicting the Next Character in a Sequence</div>
+        </div>
+        
+        <div class="models-grid">
+            <!-- Model 1: Count-Based Bigram -->
+            <div class="model-card">
+                <div class="model-header">
+                    <div class="model-icon">🔢</div>
+                    <div class="model-title">
+                        <div class="model-name">Model 1: Count-Based Bigram</div>
+                        <div class="model-type">Statistical Approach</div>
+                    </div>
+                </div>
+                
+                <div class="model-content">
+                    <div class="detail-item">
+                        <div class="detail-label">Method:</div>
+                        <div class="method-box">Count character pair frequencies from training data</div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <div class="detail-label">Context:</div>
+                        <div class="context-box">1 previous character only</div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <div class="detail-label">Parameters:</div>
+                        <div class="params-box">27×27 probability matrix (729 values)</div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <div class="detail-label">Training:</div>
+                        <div class="training-box">No training needed - just counting + smoothing</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Model 2: Neural Bigram -->
+            <div class="model-card neural">
+                <div class="model-header">
+                    <div class="model-icon">🧠</div>
+                    <div class="model-title">
+                        <div class="model-name">Model 2: Neural Bigram</div>
+                        <div class="model-type">Neural Network Approach</div>
+                    </div>
+                </div>
+                
+                <div class="model-content">
+                    <div class="detail-item">
+                        <div class="detail-label">Method:</div>
+                        <div class="method-box">Learn weight matrix through gradient descent</div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <div class="detail-label">Context:</div>
+                        <div class="context-box">1 previous character (same as count-based)</div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <div class="detail-label">Parameters:</div>
+                        <div class="params-box">27×27 weight matrix (729 learnable weights)</div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <div class="detail-label">Training:</div>
+                        <div class="training-box">3,000 epochs with backpropagation</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Model 3: MLP with Extended Context -->
+            <div class="model-card mlp">
+                <div class="model-header">
+                    <div class="model-icon">🔁</div>
+                    <div class="model-title">
+                        <div class="model-name">Model 3: MLP with Extended Context</div>
+                        <div class="model-type">Multi-Layer Perceptron</div>
+                    </div>
+                </div>
+                
+                <div class="model-content">
+                    <div class="detail-item">
+                        <div class="detail-label">Method:</div>
+                        <div class="method-box">Character embeddings + hidden layers + extended context</div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <div class="detail-label">Context:</div>
+                        <div class="context-box">3 previous characters (major improvement)</div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <div class="detail-label">Parameters:</div>
+                        <div class="params-box">11,897 learnable weights (embeddings + 2 layers)</div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <div class="detail-label">Training:</div>
+                        <div class="training-box">200,000 iterations with learning rate schedule</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Model 4: CNN-Inspired Hierarchical -->
+            <div class="model-card cnn">
+                <div class="model-header">
+                    <div class="model-icon">🌲</div>
+                    <div class="model-title">
+                        <div class="model-name">Model 4: CNN-Inspired Hierarchical</div>
+                        <div class="model-type">Hierarchical Neural Network</div>
+                    </div>
+                </div>
+                
+                <div class="model-content">
+                    <div class="detail-item">
+                        <div class="detail-label">Method:</div>
+                        <div class="method-box">Hierarchical processing with tree-like character grouping</div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <div class="detail-label">Context:</div>
+                        <div class="context-box">8 previous characters (longest context)</div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <div class="detail-label">Parameters:</div>
+                        <div class="params-box">76,579 learnable weights (embeddings + 3 levels + batch norm)</div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <div class="detail-label">Training:</div>
+                        <div class="training-box">200,000 iterations with PyTorch optimizer & scheduler</div>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <div class="detail-label">Architecture:</div>
+                        <div class="architecture-box">8→4→2→1 hierarchical reduction with batch normalization</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM Tokenization Issues - Complete Reference</title>
+    <style>
+        @page {
+            size: A5;
+            margin: 0;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            width: 595px;
+            height: 842px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            width: 100%;
+            height: 100%;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 18px;
+            color: #667eea;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        
+        .header p {
+            font-size: 11px;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .content {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 8px;
+            padding: 12px;
+            flex: 1;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .issue-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+            gap: 4px;
+            height: 100%;
+        }
+        
+        .issue-card {
+            background: #f8f9fa;
+            border-left: 3px solid #667eea;
+            padding: 4px;
+            border-radius: 3px;
+            font-size: 7px;
+            line-height: 1.1;
+            overflow: hidden;
+        }
+        
+        .issue-card:nth-child(2n) {
+            border-left-color: #764ba2;
+        }
+        
+        .issue-card:nth-child(3n) {
+            border-left-color: #38b2ac;
+        }
+        
+        .issue-card:nth-child(5n) {
+            border-left-color: #ed8936;
+        }
+        
+        .issue-card h3 {
+            font-size: 8px;
+            font-weight: bold;
+            margin-bottom: 2px;
+            color: #333;
+            display: flex;
+            align-items: center;
+        }
+        
+        .emoji {
+            font-size: 9px;
+            margin-right: 2px;
+        }
+        
+        .issue-card .problem {
+            color: #dc3545;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        
+        .issue-card .example {
+            background: #e9ecef;
+            padding: 1px 3px;
+            border-radius: 2px;
+            font-family: 'Courier New', monospace;
+            font-size: 6px;
+            margin: 1px 0;
+            color: #495057;
+        }
+        
+        .issue-card .impact {
+            color: #856404;
+            font-size: 6px;
+            margin-top: 1px;
+        }
+        
+        .footer {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 8px;
+            border-radius: 6px;
+            text-align: center;
+            margin-top: 8px;
+            font-size: 10px;
+            color: #666;
+            font-weight: bold;
+        }
+        
+        .highlight {
+            background: #fff3cd;
+            padding: 1px 3px;
+            border-radius: 2px;
+            font-weight: bold;
+        }
+        
+        .code-snippet {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 1px 2px;
+            border-radius: 2px;
+            font-family: monospace;
+            font-size: 5px;
+            margin: 1px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔤 LLM TOKENIZATION ISSUES REFERENCE GUIDE</h1>
+            <p>Complete catalog of weird behaviors caused by text-to-token conversion</p>
+        </div>
+        
+        <div class="content">
+            <div class="issue-grid">
+                <!-- Issue 1 -->
+                <div class="issue-card">
+                    <h3><span class="emoji">🔍</span> SPELLING & CHARACTER TASKS</h3>
+                    <div class="problem">Can't count letters or reverse words properly</div>
+                    <div class="example">"defaultStyle" → single token</div>
+                    <div class="impact">
+                        • Can't count 'l's in "defaultStyle"<br>
+                        • Can't reverse strings character by character<br>
+                        • Struggles with spelling, anagrams, rhyming<br>
+                        • <span class="highlight">Workaround:</span> Ask model to split into characters first
+                    </div>
+                </div>
+                
+                <!-- Issue 2 -->
+                <div class="issue-card">
+                    <h3><span class="emoji">🐟</span> SOLID GOLD MAGIKARP MYSTERY</h3>
+                    <div class="problem">Certain strings caused models to go completely crazy</div>
+                    <div class="example">Triggers: "solid gold Magikarp", "StreamerBot", "petertodd"</div>
+                    <div class="impact">
+                        • Model evasion: "I can't assist with that"<br>
+                        • Random hallucinations and unrelated responses<br>
+                        • Insults and inappropriate responses<br>
+                        • Complete breakdown of normal behavior<br>
+                        • <span class="highlight">Root cause:</span> Reddit usernames in tokenization data got dedicated tokens but never appeared in LM training = untrained embeddings
+                    </div>
+                </div>
+                
+                <!-- Issue 3 -->
+                <div class="issue-card">
+                    <h3><span class="emoji">🌍</span> NON-ENGLISH LANGUAGE PROBLEMS</h3>
+                    <div class="problem">Other languages get terrible tokenization efficiency</div>
+                    <div class="example">
+                        EN: "Hello, how are you?" → 5 tokens<br>
+                        KR: "안녕하세요, 어떻게 지내세요?" → 15 tokens (3x more!)<br>
+                        Simple "안녕" → 3 tokens vs "hello" → 1 token
+                    </div>
+                    <div class="impact">
+                        • Uses up context window faster<br>
+                        • Higher computational costs<br>
+                        • Worse model performance<br>
+                        • Less training data per token
+                    </div>
+                </div>
+                
+                <!-- Issue 4 -->
+                <div class="issue-card">
+                    <h3><span class="emoji">🔢</span> ARITHMETIC FAILURES</h3>
+                    <div class="problem">Numbers tokenized completely arbitrarily</div>
+                    <div class="example">
+                        "127" → single token<br>
+                        "677" → two tokens [6, 77]<br>
+                        "1234" → could be [12, 34] or [123, 4] or single token
+                    </div>
+                    <div class="impact">
+                        • Addition works digit-by-digit<br>
+                        • Model can't access individual digits consistently<br>
+                        • Same number might be split differently in contexts<br>
+                        • Makes arithmetic unreliable and inconsistent
+                    </div>
+                </div>
+                
+                <!-- Issue 5 -->
+                <div class="issue-card">
+                    <h3><span class="emoji">🐍</span> PYTHON/CODE HANDLING DISASTERS</h3>
+                    <div class="problem">GPT-2: Every space was separate token (220, 220, 220, 220)</div>
+                    <div class="code-snippet">def function():
+    if condition:  # Each space = token 220!
+        return value</div>
+                    <div class="impact">
+                        • Python code used huge amounts of context for indentation<br>
+                        • Massive token waste on whitespace<br>
+                        • Poor code performance<br>
+                        • <span class="highlight">Fixed in GPT-4:</span> Multiple spaces now group into single tokens
+                    </div>
+                </div>
+                
+                <!-- Issue 6 -->
+                <div class="issue-card">
+                    <h3><span class="emoji">⚠️</span> TRAILING WHITESPACE CHAOS</h3>
+                    <div class="problem">Spaces are usually prefixes to words</div>
+                    <div class="example">
+                        Normal: "The capital of France is" → next token " Paris" (space+word)<br>
+                        With trailing space: "The capital of France is " → space becomes separate token
+                    </div>
+                    <div class="impact">
+                        • Model expects "space+word" but gets "word" without space<br>
+                        • Breaks learned patterns, causes degraded performance<br>
+                        • API warnings common<br>
+                        • Off-distribution behavior
+                    </div>
+                </div>
+                
+                <!-- Issue 7 -->
+                <div class="issue-card">
+                    <h3><span class="emoji">🛡️</span> UNKNOWN TOKEN VULNERABILITIES</h3>
+                    <div class="problem">Special tokens in user input can break systems</div>
+                    <div class="example">User typing "&lt;|endoftext|&gt;" might be parsed as actual end token</div>
+                    <div class="impact">
+                        • Bypass safety filters<br>
+                        • Cause unexpected model behavior<br>
+                        • Trigger hidden functionalities<br>
+                        • Break conversation flow
+                    </div>
+                </div>
+                
+                <!-- Issue 8 -->
+                <div class="issue-card">
+                    <h3><span class="emoji">🔍</span> PARTIAL TOKEN PROBLEMS</h3>
+                    <div class="problem">"Unstable tokens": When prompts end mid-token</div>
+                    <div class="example">"defaultSty" (partial "defaultStyle" token)</div>
+                    <div class="impact">
+                        • Model never trained on partial tokens<br>
+                        • Undefined behavior, potential crashes<br>
+                        • Wrong completions<br>
+                        • Off-distribution inputs
+                    </div>
+                </div>
+                
+                <!-- Issue 9 -->
+                <div class="issue-card">
+                    <h3><span class="emoji">💰</span> FORMAT EFFICIENCY VARIATIONS</h3>
+                    <div class="problem">Same data, different token costs</div>
+                    <div class="example">
+                        JSON: 116 tokens<br>
+                        YAML: 99 tokens<br>
+                        CSV: Much fewer tokens
+                    </div>
+                    <div class="impact">
+                        • Dramatically affects API costs and context usage<br>
+                        • Processing efficiency varies<br>
+                        • Format choice critical<br>
+                        • Token economy considerations
+                    </div>
+                </div>
+                
+                <!-- Issue 10 -->
+                <div class="issue-card">
+                    <h3><span class="emoji">🔤</span> CASE SENSITIVITY INCONSISTENCIES</h3>
+                    <div class="problem">"egg", "Egg", " egg" all become different tokens</div>
+                    <div class="example">
+                        Same concept, different representations<br>
+                        Model must learn these are same from scratch
+                    </div>
+                    <div class="impact">
+                        • Model must learn these are the same concept from scratch<br>
+                        • Vocabulary waste: Multiple tokens for same semantic meaning<br>
+                        • Training inefficiency<br>
+                        • Semantic redundancy
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            🎯 <strong>KEY INSIGHT:</strong> Most weird LLM behaviors trace back to tokenization, not the model itself!<br>
+            <strong>THE DREAM:</strong> Tokenization-free models working directly on bytes/characters
+        </div>
+    </div>
+</body>
+</html> 

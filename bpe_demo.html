@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>BPE Workflow - Static Visualization</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 40px;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      margin: 0;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      padding: 40px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 10px;
+      font-size: 2.5em;
+      font-weight: 300;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #7f8c8d;
+      margin-bottom: 50px;
+      font-size: 1.2em;
+    }
+
+    .workflow {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin: 40px 0;
+      overflow-x: auto;
+      padding: 20px 0;
+    }
+
+    .step {
+      text-align: center;
+      min-width: 220px;
+      flex: 1;
+    }
+
+    .step-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 15px;
+      border-radius: 12px 12px 0 0;
+      font-weight: bold;
+      font-size: 1.1em;
+    }
+
+    .step-content {
+      background: #f8f9fa;
+      border: 2px solid #e9ecef;
+      border-top: none;
+      padding: 20px;
+      border-radius: 0 0 12px 12px;
+      min-height: 180px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .example-text {
+      font-family: 'Courier New', monospace;
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 10px 0;
+      border: 1px solid #dee2e6;
+      font-size: 0.9em;
+      line-height: 1.4;
+    }
+
+    .large-text {
+      font-size: 1.1em;
+      color: #2c3e50;
+      line-height: 1.6;
+    }
+
+    .bytes {
+      font-size: 0.85em;
+      color: #495057;
+      word-break: break-all;
+    }
+
+    .numbers {
+      font-size: 0.9em;
+      color: #6f42c1;
+      line-height: 1.5;
+    }
+
+    .pairs {
+      font-size: 0.9em;
+      color: #28a745;
+    }
+
+    .final-tokens {
+      font-size: 1em;
+      color: #dc3545;
+      font-weight: 600;
+    }
+
+    .arrow {
+      font-size: 2em;
+      color: #6c757d;
+      align-self: center;
+      margin: 0 5px;
+    }
+
+    .highlight {
+      background: #fff3cd;
+      padding: 2px 4px;
+      border-radius: 3px;
+      border: 1px solid #ffc107;
+    }
+
+    .token-box {
+      display: inline-block;
+      background: #e3f2fd;
+      border: 1px solid #2196f3;
+      padding: 4px 8px;
+      margin: 2px;
+      border-radius: 4px;
+      font-size: 0.85em;
+    }
+
+    .process-note {
+      background: #d1ecf1;
+      border: 1px solid #bee5eb;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 30px;
+      font-size: 0.95em;
+      color: #0c5460;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Byte Pair Encoding (BPE) Workflow</h1>
+    <p class="subtitle">From Large Text to Efficient Tokenization</p>
+
+    <div class="workflow">
+      <!-- Step 1: Large Text -->
+      <div class="step">
+        <div class="step-header">1. Large Text Input</div>
+        <div class="step-content">
+          <div class="example-text large-text">
+            "The quick brown fox jumps over the lazy dog. This is a sample paragraph with repeated words and common patterns that will demonstrate how BPE works effectively."
+          </div>
+        </div>
+      </div>
+
+      <div class="arrow">→</div>
+
+      <!-- Step 2: Convert to Bytes -->
+      <div class="step">
+        <div class="step-header">2. Convert to Bytes</div>
+        <div class="step-content">
+          <div class="example-text bytes">
+            01010100 01101000 01100101 00100000 01110001 01110101 01101001 01100011 01101011 00100000 01100010 01110010 01101111 01110111 01101110...
+          </div>
+          <p><strong>UTF-8 Encoding</strong><br>Each character → binary representation</p>
+        </div>
+      </div>
+
+      <div class="arrow">→</div>
+
+      <!-- Step 3: Byte Values (0-256) -->
+      <div class="step">
+        <div class="step-header">3. Byte Values (0-256)</div>
+        <div class="step-content">
+          <div class="example-text numbers">
+            84, 104, 101, 32, 113, 117, 105, 99, 107, 32, 98, 114, 111, 119, 110, 32, 102, 111, 120, 32, 106, 117, 109, 112, 115...
+          </div>
+          <p><strong>Integer Values</strong><br>Each byte as number 0-255</p>
+        </div>
+      </div>
+
+      <div class="arrow">→</div>
+
+      <!-- Step 4: Initial Pairing -->
+      <div class="step">
+        <div class="step-header">4. Find Most Frequent Pairs</div>
+        <div class="step-content">
+          <div class="example-text pairs">
+            <span class="highlight">(32, 116)</span> → " t" (12 times)<br>
+            <span class="highlight">(104, 101)</span> → "he" (8 times)<br>
+            <span class="highlight">(111, 119)</span> → "ow" (6 times)<br>
+            <span class="highlight">(101, 32)</span> → "e " (5 times)
+          </div>
+          <p><strong>Frequency Analysis</strong><br>Count adjacent byte pairs</p>
+        </div>
+      </div>
+
+      <div class="arrow">→</div>
+
+      <!-- Step 5: Merge and Iterate -->
+      <div class="step">
+        <div class="step-header">5. Merge & Iterate</div>
+        <div class="step-content">
+          <div class="example-text">
+            <div class="token-box">The</div>
+            <div class="token-box">_quick</div>
+            <div class="token-box">_brown</div>
+            <div class="token-box">fox</div>
+            <div class="token-box">jumps</div>
+            <div class="token-box">over</div>
+            <div class="token-box">the</div>
+            <div class="token-box">lazy</div>
+            <div class="token-box">dog</div>
+          </div>
+          <p><strong>Final Tokens</strong><br>Efficient subword units</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="process-note">
+      <strong>BPE Process Summary:</strong> Start with raw text, convert each character to its byte representation (0-255), 
+      then iteratively find the most frequent adjacent byte pairs and merge them into new tokens. This creates a vocabulary 
+      of subword units that balance between character-level and word-level representations, enabling efficient text processing 
+      while handling unknown words gracefully.
+    </div>
+  </div>
+</body>
+</html>

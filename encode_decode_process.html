@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BPE Encode & Decode Process</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            padding: 40px;
+            max-width: 1000px;
+            width: 100%;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 1.2em;
+            font-style: italic;
+        }
+        
+        .process-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 30px;
+        }
+        
+        .process-box {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            position: relative;
+            border-top: 6px solid #667eea;
+        }
+        
+        .process-box.decode {
+            border-top-color: #764ba2;
+        }
+        
+        .process-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .process-icon {
+            font-size: 2.5em;
+            margin-right: 15px;
+        }
+        
+        .process-title {
+            font-size: 2em;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .process-description {
+            font-size: 1.1em;
+            color: #555;
+            margin-bottom: 25px;
+            font-style: italic;
+        }
+        
+        .step-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .step-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border-left: 4px solid #667eea;
+        }
+        
+        .decode .step-item {
+            border-left-color: #764ba2;
+        }
+        
+        .step-number {
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+            font-size: 0.9em;
+        }
+        
+        .decode .step-number {
+            background: #764ba2;
+        }
+        
+        .step-content {
+            flex: 1;
+        }
+        
+        .step-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 1.1em;
+        }
+        
+        .step-description {
+            color: #666;
+            line-height: 1.5;
+            font-size: 0.95em;
+        }
+        
+        .highlight {
+            background: #fff3cd;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+            color: #856404;
+        }
+        
+        .code-example {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 10px 12px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            margin-top: 8px;
+            line-height: 1.4;
+        }
+        
+        .arrow {
+            position: absolute;
+            top: 50%;
+            right: -20px;
+            transform: translateY(-50%);
+            font-size: 2em;
+            color: #667eea;
+            z-index: 10;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #eee;
+            color: #666;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔤 BPE Tokenization Process</h1>
+            <p>Byte Pair Encoding: From Text to Tokens and Back</p>
+        </div>
+        
+        <div class="process-container">
+            <!-- ENCODE PROCESS -->
+            <div class="process-box encode">
+                <div class="process-header">
+                    <div class="process-icon">✅</div>
+                    <div class="process-title">ENCODE</div>
+                </div>
+                <div class="process-description">
+                    Given a string, generate tokens
+                </div>
+                
+                <ol class="step-list">
+                    <li class="step-item">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <div class="step-title">Convert to Bytes</div>
+                            <div class="step-description">
+                                Encode input string as <span class="highlight">UTF-8 bytes</span>
+                            </div>
+                            <div class="code-example">"hello" → [104, 101, 108, 108, 111]</div>
+                        </div>
+                    </li>
+                    
+                    <li class="step-item">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <div class="step-title">Find Frequent Pairs</div>
+                            <div class="step-description">
+                                Iteratively merge the <span class="highlight">most frequent byte pairs</span>
+                            </div>
+                            <div class="code-example">Find pair [108, 108] occurs most → merge as token 256</div>
+                        </div>
+                    </li>
+                    
+                    <li class="step-item">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <div class="step-title">Apply Merge Rules</div>
+                            <div class="step-description">
+                                Merging follows the <span class="highlight">predefined order in merges map</span>
+                            </div>
+                            <div class="code-example">Use trained merge rules: (101,108)→257, (104,257)→258</div>
+                        </div>
+                    </li>
+                    
+                    <li class="step-item">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <div class="step-title">Complete Tokenization</div>
+                            <div class="step-description">
+                                Continue until <span class="highlight">no more mergeable tokens remain</span>
+                            </div>
+                            <div class="code-example">Final: [104, 101, 108, 108, 111] → [258, 111]</div>
+                        </div>
+                    </li>
+                </ol>
+            </div>
+            
+            <!-- DECODE PROCESS -->
+            <div class="process-box decode">
+                <div class="process-header">
+                    <div class="process-icon">🔁</div>
+                    <div class="process-title">DECODE</div>
+                </div>
+                <div class="process-description">
+                    Convert tokens back to original string
+                </div>
+                
+                <ol class="step-list">
+                    <li class="step-item">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <div class="step-title">Build Base Vocabulary</div>
+                            <div class="step-description">
+                                Start with vocabulary of <span class="highlight">all single-byte values (0–255)</span>
+                            </div>
+                            <div class="code-example">vocab = {0: b'\x00', 1: b'\x01', ..., 255: b'\xff'}</div>
+                        </div>
+                    </li>
+                    
+                    <li class="step-item">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <div class="step-title">Expand Vocabulary</div>
+                            <div class="step-description">
+                                Expand vocabulary by <span class="highlight">merging byte pairs based on BPE rules</span>
+                            </div>
+                            <div class="code-example">vocab[256] = vocab[108] + vocab[108] = b'll'</div>
+                        </div>
+                    </li>
+                    
+                    <li class="step-item">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <div class="step-title">Map Token IDs</div>
+                            <div class="step-description">
+                                For decoding, <span class="highlight">map each token ID back to its byte sequence</span>
+                            </div>
+                            <div class="code-example">tokens [258, 111] → vocab[258] + vocab[111]</div>
+                        </div>
+                    </li>
+                    
+                    <li class="step-item">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <div class="step-title">Recover Original String</div>
+                            <div class="step-description">
+                                <span class="highlight">Join and decode bytes</span> to recover the original UTF-8 string
+                            </div>
+                            <div class="code-example">b'hello'.decode('utf-8') → "hello"</div>
+                        </div>
+                    </li>
+                </ol>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <strong>Key Insight:</strong> BPE creates a reversible compression that balances vocabulary size with sequence length
+        </div>
+    </div>
+</body>
+</html> 

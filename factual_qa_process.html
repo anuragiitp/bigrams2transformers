@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Factual Q&A Process</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 8px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+            padding: 15px;
+            max-width: 500px;
+            width: 100%;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        
+        .header h1 {
+            font-size: 1.3em;
+            color: #333;
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 0.75em;
+            font-style: italic;
+        }
+        
+        .process-flow {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+            margin: 12px 0;
+        }
+        
+        .step {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 6px;
+            padding: 10px;
+            text-align: center;
+            position: relative;
+            border: 1px solid #e2e6ea;
+            transition: transform 0.2s ease;
+        }
+        
+        .step:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .step-number {
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #667eea;
+            color: white;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7em;
+            font-weight: bold;
+        }
+        
+        .step-icon {
+            font-size: 1.3em;
+            margin: 4px 0;
+        }
+        
+        .step-title {
+            font-size: 0.85em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        
+        .step-desc {
+            font-size: 0.7em;
+            color: #555;
+            line-height: 1.3;
+        }
+        
+        .evaluation-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin: 10px 0;
+        }
+        
+        .eval-box {
+            background: #f8f9fa;
+            border-radius: 4px;
+            padding: 8px;
+            border-left: 3px solid #28a745;
+        }
+        
+        .eval-box.correctness {
+            border-left-color: #007bff;
+        }
+        
+        .eval-box.informativeness {
+            border-left-color: #28a745;
+        }
+        
+        .eval-title {
+            font-size: 0.8em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .eval-icon {
+            margin-right: 4px;
+            font-size: 0.9em;
+        }
+        
+        .eval-desc {
+            font-size: 0.65em;
+            color: #555;
+            line-height: 1.2;
+        }
+        
+        .refusal-section {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            border: 1px solid #ffc107;
+            border-radius: 6px;
+            padding: 8px;
+            margin-top: 8px;
+            text-align: center;
+        }
+        
+        .refusal-title {
+            font-size: 0.85em;
+            font-weight: bold;
+            color: #856404;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .refusal-icon {
+            margin-right: 4px;
+            font-size: 1em;
+        }
+        
+        .refusal-desc {
+            font-size: 0.7em;
+            color: #856404;
+            line-height: 1.3;
+        }
+        
+        .arrow {
+            position: absolute;
+            right: -12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1em;
+            color: #667eea;
+        }
+        
+        .step:last-child .arrow {
+            display: none;
+        }
+        
+        .llama-badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 1px 3px;
+            border-radius: 2px;
+            font-size: 0.6em;
+            font-weight: bold;
+            margin-left: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 Factual Q&A Generation & Evaluation Process</h1>
+            <p>Automated pipeline for creating and scoring factual questions</p>
+        </div>
+        
+        <div class="process-flow">
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-icon">📋</div>
+                <div class="step-title">Extract Context</div>
+                <div class="step-desc">Select factual content snippet from pre-training data</div>
+                <div class="arrow">→</div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-icon">❓</div>
+                <div class="step-title">Generate Question</div>
+                <div class="step-desc">Use Llama 3<span class="llama-badge">🦙</span> to create factual question from snippet</div>
+                <div class="arrow">→</div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-icon">💬</div>
+                <div class="step-title">Sample Answers</div>
+                <div class="step-desc">Prompt Llama 3<span class="llama-badge">🦙</span> to generate multiple responses</div>
+            </div>
+        </div>
+        
+        <div class="evaluation-section">
+            <div class="eval-box correctness">
+                <div class="eval-title">
+                    <span class="eval-icon">✅</span>
+                    Score Correctness
+                </div>
+                <div class="eval-desc">
+                    • Compare to original snippet (ground truth)<br>
+                    • Use Llama 3<span class="llama-badge">🦙</span> as judge
+                </div>
+            </div>
+            
+            <div class="eval-box informativeness">
+                <div class="eval-title">
+                    <span class="eval-icon">📊</span>
+                    Score Informativeness
+                </div>
+                <div class="eval-desc">
+                    • Assess response quality<br>
+                    • Judge using Llama 3<span class="llama-badge">🦙</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="refusal-section">
+            <div class="refusal-title">
+                <span class="refusal-icon">🚫</span>
+                Generate Refusals
+            </div>
+            <div class="refusal-desc">
+                If responses are consistently <strong>Informative but Incorrect</strong><br>
+                → Generate refusal response (e.g., "I don't know")
+            </div>
+        </div>
+    </div>
+</body>
+</html> 
