@@ -8,3 +8,8 @@ This repository outlines different **approaches to learn** language modeling con
 5. **Simple Transformer Model** - Self-attention based architecture
 
 Each approach builds upon the previous one, making it ideal for educational purposes and understanding the evolution of modern NLP techniques.
+
+
+
+- `four_models_comparison.ipynb` - Main notebook comparing different modeling approaches
+- `simple_transformer_az.ipynb` - Focused implementation of a simple transformer for a-z character generation
