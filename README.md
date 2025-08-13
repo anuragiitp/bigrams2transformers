@@ -1,12 +1,3 @@
-
-This repository outlines different **approaches to learn** language modeling concepts through a progression of increasingly sophisticated models:
-
-1. **Count-Based Bigram Model** - Uses frequency statistics of character pairs
-2. **Neural Bigram Model** - Simple neural network for next character prediction  
-3. **MLP with Extended Context** - Multi-layer perceptron with richer context
-4. **CNN-Inspired Hierarchical Model** - Processes sequences hierarchically
-5. **Simple Transformer Model** - Self-attention based architecture
-
 # From Bigrams to Transformers: A Complete Journey Through Language Modeling Evolution
 
 *Understanding the progression from simple statistical models to modern AI architectures through hands-on character-level text generation*
