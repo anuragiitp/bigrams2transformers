@@ -1731,5 +1731,3 @@ Special thanks to Andrej Karpathy for pioneering the educational philosophy of u
 ---
 
 *Found this helpful? Follow for more deep dives into AI fundamentals. And if you build something cool with these concepts, I'd love to hear about it!*
-
-
